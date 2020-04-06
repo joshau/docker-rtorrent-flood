@@ -1,8 +1,8 @@
 FROM alpine:3.9
 
-ARG RTORRENT_VER=0.9.7
-ARG LIBTORRENT_VER=0.13.7
-ARG MEDIAINFO_VER=19.04
+ARG RTORRENT_VER=0.9.8
+ARG LIBTORRENT_VER=0.13.8
+ARG MEDIAINFO_VER=20.03
 ARG FLOOD_VER=master
 ARG BUILD_CORES
 
@@ -56,7 +56,8 @@ RUN NB_CORES=${BUILD_CORES-`getconf _NPROCESSORS_CONF`} \
  && cd /tmp/mktorrent && make -j ${NB_CORES} && make install \
  && cd /tmp/xmlrpc-c/advanced && ./configure && make -j ${NB_CORES} && make install \
  && cd /tmp/libtorrent && ./autogen.sh && ./configure && make -j ${NB_CORES} && make install \
- && cd /tmp/rtorrent && ./autogen.sh && ./configure --with-xmlrpc-c && make -j ${NB_CORES} && make install \
+ && cd /tmp/rtorrent &&  sed -i 's/int max_content_size    = (2 << 20);/int max_content_size    = (1 << 24);/' src/rpc/scgi_task.h \
+ && ./autogen.sh && ./configure --with-xmlrpc-c && make -j ${NB_CORES} && make install \
  && cd /tmp \
  && wget -q http://mediaarea.net/download/binary/mediainfo/${MEDIAINFO_VER}/MediaInfo_CLI_${MEDIAINFO_VER}_GNU_FromSource.tar.gz \
  && wget -q http://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VER}/MediaInfo_DLL_${MEDIAINFO_VER}_GNU_FromSource.tar.gz \
